@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Ventas Cevichón</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <label for="theme" class="theme">
+        <span class="theme__toggle-wrap">
+            <input id="theme" class="theme__toggle" type="checkbox" role="switch" name="theme" value="dark" onclick="toggleTheme()">
+            <span class="theme__icon">
+                <span class="theme__icon-part"></span>
+                <span class="theme__icon-part"></span>
+                <span class="theme__icon-part"></span>
+                <span class="theme__icon-part"></span>
+                <span class="theme__icon-part"></span>
+                <span class="theme__icon-part"></span>
+                <span class="theme__icon-part"></span>
+                <span class="theme__icon-part"></span>
+                <span class="theme__icon-part"></span>
+            </span>
+        </span>
+    </label>
+
+
+    <!-- login panel Section -->
+
+    <div id="login-section" class="section">
+        <form onsubmit="login()">
+            <h2>Inicia Sesion</h2>
+
+            <p>Nombre de usuario:</p>
+            <input id="username-input" type="text" placeholder="Nombre de usuario..">
+
+            <p>Contraseña:</p>
+            <input id="password-input" type="password" placeholder="Contraseña..">
+            
+            <input type="submit" style="position: absolute; left: -9999px;">
+            <button id="login-button" onclick="login()">Iniciar Sesion</button>
+        </form>
+    </div>
+
+
+    <div class="main-site">
+            
+        <header>
+            <div class="nav">
+                <h1>Sistema de Ventas Cevichón</h1>
+                <div class="nav-buttons">
+                    <button onclick="showSection('product-management')">Administracion de Productos</button>
+                    <button onclick="showSection('ventas')">Ventas</button>
+                    <button onclick="showSection('pedidos'), updateOrderDotStatus(), loadOrders()">Pedidos</button>
+                    <button onclick="showSection('caja')">Caja</button>
+                </div>
+                <div class="user-container">
+                    <p id="username-text">Nombre de Usuario</p>
+                    <button id="user-button" onclick="toggleUserMenu()"><svg width="44px" height="44px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></button>
+                    <div class="user-menu hidden">
+                        <button id="close-sesion-button" onclick="logout()">Cerrar Sesion</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+
+
+
+        
+        <!-- Product Management Section -->
+        <div id="product-management" class="section">
+            <h2>Administrar Productos</h2>
+            <div class="product-container">
+                <div id="products-list">
+                    
+                    <h3>Catalogo de Productos</h3>
+                    <ul class="class-table">
+                        <p>ID</p><p>Nombre</p><p>Precio</p><p>Stock</p>
+                    </ul>
+                    <ul id="products"></ul>
+                </div>
+                <div id="product-form">
+                    <h3>Añadir Producto</h3>
+                    <input type="text" id="product-name" placeholder="Nombre del Producto" required>
+                    <input type="number" id="product-price" placeholder="Precio" min="0" required>
+                    <input type="number" id="product-stock" placeholder="Stock" min="0" required>
+                    <button onclick="addProduct()">Añadir Producto</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sales Section -->
+        <div id="ventas" class="section" style="display:none;">
+            <h2>Ventas</h2>
+            <div class="ventas-containers">
+                <div id="sales"></div>
+            </div>
+        </div>
+
+
+
+        <!-- Pedidos Section -->
+        <div id="pedidos" class="section" style="display:none;">
+            <div class="title-pedidos">
+                <h2>Pedidos</h2>
+                <button id="refresh-button" onclick="refreshOrders()">Refrescar</button>
+            </div>
+            <div class="pedidos-container">
+                <li class="pedidos-class-list"><p>ID del Pedido</p><p>Nombre Cliente</p><p class="order-address-text">Direccion del Cliente</p><p>Fecha/hora del pedido</p><p id="total-pedido-text">Total del Pedido</p><p>Estado</p></li>
+                <div class="registro-pedidos-container">
+                    
+                </div>
+            </div>
+
+            <div class="order-details-bg">
+                
+            </div>
+        </div>
+
+
+
+
+        <!-- Caja Section -->
+        <div id="caja" class="section" style="display:none;">
+            <h2>Caja</h2>
+            <div class="containers">
+                <div class="items-container">
+                    <div id="items-container" class="items-box-container">
+                        <li class="class-list"><p>ID</p><p>Nombre</p><p>Precio</p><p>Cantidad</p><p id="total-class">Total</p></li>
+                        <p id="no-products">No hay productos Añadidos.</p>
+                    </div>
+                    <button id="add-product-button" class="add-product" onclick="browseProducts()">Añadir Manualmente</button>
+                    <div id="products-catalog" style="display: none;">
+                        
+                    </div>
+                </div>
+                <div class="caja-container">
+                    <div class="detalles-container">
+                        <div class="nombre-cliente-container">
+                            <p>Nombre del cliente:</p>
+                            <input type="text" placeholder="Nombre del Cliente" id="nombre-cliente" onchange="mostarCompleteButton()">
+                        </div>
+                        <div class="nombre-cliente-container">
+                            <p>Numero del cliente:</p>
+                            <input type="number" placeholder="Ej: 912345678" id="numero-cliente" onchange="mostarCompleteButton()">
+                        </div>
+                        <div class="location-container">
+                            <label for="direccion" style="margin-bottom: .5rem;">Selecciona el tipo de direccion:</label>
+                            <div class="selection-container">
+                                <div class="select-1">
+                                    <input type="radio" name="direccion" id="direccion1" value="delivery" onchange="selectLocation(), mostarCompleteButton()"><label for="direccion">Envio a Domicilio</label>
+                                </div>
+                                <div class="select-2">
+                                    <input type="radio" name="direccion" id="direccion2" value="local" onchange="selectLocation(), mostarCompleteButton()"><label for="direccion">Retiro en Local</label>
+                                </div>
+                            </div>
+                            <div class="direccion-container hidden" style="margin-top: .5rem; margin-bottom: .5rem;">
+                                <label for="location">Direccion del cliente:</label>
+                                <input style="margin-top: .5rem;" type="text" placeholder="Ej: ohiggins 1511" id="direccion-cliente" onchange="mostarCompleteButton()">
+                            </div>
+                        </div>
+                        <div class="descuento-container">
+                            <p>Descuento (%):</p>
+                            <input type="number" placeholder="%" max="100" min="0" value="0" id="discount-input" onchange="applyDiscount()">
+                        </div>
+                    </div>
+                    <div class="total-container">
+                        <h4>Total: </h4><h4 id="total-cart">$0</h4>
+                    </div>
+                    <button id="complete-button" class="hidden" onclick="completeOrder()">Completar Pedido</button>                   
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,9 +1,145 @@
+function resetSessionTimer() {
+    startSessionTimer(); // Reiniciar el temporizador
+}
 
 document.addEventListener('DOMContentLoaded', () => {
+    const isLoggedIn = localStorage.getItem('loggedIn');
+    const currentUser = localStorage.getItem('user');
+    const userNameTXT = document.getElementById('username-text');
+    
+    if (isLoggedIn === 'true') {
+
+        document.querySelector('.main-site').style.display = 'flex';
+        document.getElementById('login-section').style.display = 'none';
+        startSessionTimer(); // Iniciar el temporizador si el usuario está logueado
+
+        userNameTXT.innerText = currentUser;
+    }
+
     loadProducts();
     loadSales();
     loadOrders();
+
+    theme = localStorage.getItem('theme');
+    const lightColor = 'rgb(142, 175, 212)';
+    const darkColor = 'rgb(30, 30, 30)';
+    const themeInput = document.getElementById('theme');
+
+    if (theme == 'dark') {
+        document.querySelector('body').style.backgroundColor = `${darkColor}`;
+        document.getElementById('login-section').style.backgroundColor = `${darkColor}`;
+        themeInput.checked = true;
+        darkmode = true;
+    }
+    else {
+        document.querySelector('body').style.backgroundColor = `${lightColor}`;
+        document.getElementById('login-section').style.backgroundColor = `${lightColor}`;
+        themeInput.checked = false;
+        darkmode = false;
+    }
+
+    // Escuchar eventos de actividad del usuario para reiniciar el temporizador
+    document.addEventListener('mousemove', resetSessionTimer);
+    document.addEventListener('keypress', resetSessionTimer);
 });
+
+function logout() {
+    localStorage.removeItem('loggedIn');
+    document.querySelector('.main-site').style.display = 'none';
+    document.getElementById('login-section').style.display = 'flex';
+    clearTimeout(sessionTimeout);
+    window.location.replace("./");
+}
+
+let sessionTimeout;
+
+function startSessionTimer() {
+    // Limpiar cualquier temporizador anterior
+    clearTimeout(sessionTimeout);
+
+    // Configurar un nuevo temporizador de 5 minutos
+    sessionTimeout = setTimeout(logout, 900000); // 5 minutos en milisegundos
+}
+
+function login() {
+    const usernameInput = document.getElementById('username-input');
+    const passwordInput = document.getElementById('password-input');
+    const mainContent = document.querySelector('.main-site');
+    const loginPanel = document.getElementById('login-section');
+
+
+
+    if (usernameInput.value != '') {
+        if (passwordInput.value != '') {
+            fetch('/users')
+            .then(response => response.json())
+            .then(users => {
+                users.forEach(user => {
+                    if (user.username === usernameInput.value) {
+                        if (user.password === passwordInput.value) {
+
+                            mainContent.style.display = 'flex';
+                            loginPanel.style.display = 'none';
+                            localStorage.setItem('loggedIn', 'true');
+                            localStorage.setItem('user', `${user.username}`);
+                            startSessionTimer(); // Iniciar el temporizador de sesión
+
+
+                        } else {
+                            console.log('Contraseña Incorrecta');
+                        }
+                    } else {
+                        console.log('Nombre de Usuario Incorrecto');
+                    }
+                });
+            })
+            .catch(err => console.error('Error loading users:', err));
+        }
+    }
+}
+
+let isMenuActive = false
+
+function toggleUserMenu() {
+    const userMenu = document.querySelector('.user-menu');
+
+    if (!isMenuActive) {
+        userMenu.classList.remove('hidden');
+    }
+    else{
+        userMenu.classList.add('hidden');
+    }
+
+    isMenuActive = !isMenuActive;
+}
+
+
+
+
+
+
+
+
+
+
+let darkmode = false;
+function toggleTheme() {
+
+    const lightColor = 'rgb(142, 175, 212)';
+    const darkColor = 'rgb(30, 30, 30)';
+
+    if (darkmode == false) {
+        document.querySelector('body').style.backgroundColor = `${darkColor}`;
+        document.getElementById('login-section').style.backgroundColor = `${darkColor}`;
+        localStorage.setItem('theme', 'dark');
+    }
+    else {
+        document.querySelector('body').style.backgroundColor = `${lightColor}`;
+        document.getElementById('login-section').style.backgroundColor = `${lightColor}`;
+        localStorage.setItem('theme', 'light');
+    }
+    darkmode = !darkmode;
+}
 
 let isActive;
 const addManuallyButton = document.getElementById('add-product-button');
@@ -312,9 +448,6 @@ function addToCart(productId) {
     const quantityInput = document.getElementById(`product-quantity-${productId}-input`);
     const selectedQuantity = quantityInput.getAttribute('data-quantity') || quantityInput.value;
 
-    console.log(productId);
-    console.log(existingProduct);
-
     if (existingProduct) {
         const currentQuantityInput = existingProduct.querySelector('.product-quantity');
         const newQuantity = parseInt(currentQuantityInput.value) + parseInt(selectedQuantity);
@@ -506,8 +639,6 @@ function completeOrder() {
             cartProducts.push(product);
         });
         
-
-        console.log(cartProducts);
         // Llamar a la función insertOrderItems con el array cartProducts
         fetch('/order_items', {
             method: 'POST',
@@ -518,7 +649,7 @@ function completeOrder() {
         })
         .then(response => response.json())
         .then(data => {
-            console.log("Orden enviada correctamente");
+
         })
         .catch(err => console.error('Error adding order:', err));
 
