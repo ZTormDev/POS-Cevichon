@@ -59,10 +59,10 @@
             <div class="nav">
                 <h1>Sistema de Ventas Cevichón</h1>
                 <div class="nav-buttons">
-                    <button onclick="showSection('product-management')">Administracion de Productos</button>
-                    <button onclick="showSection('ventas')">Ventas</button>
-                    <button onclick="showSection('pedidos'), updateOrderDotStatus(), loadOrders()">Pedidos</button>
-                    <button onclick="showSection('caja')">Caja</button>
+                    <button id="product-management-button" onclick="showSection('product-management')">Administracion de Productos</button>
+                    <button id="sales-button" onclick="showSection('ventas')">Ventas</button>
+                    <button id="orders-button" onclick="showSection('pedidos'), updateOrderDotStatus(), loadOrders()">Pedidos</button>
+                    <button id="box-button" onclick="showSection('caja')">Caja</button>
                 </div>
                 <div class="user-container">
                     <p id="username-text">Nombre de Usuario</p>

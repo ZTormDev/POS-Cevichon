@@ -9,11 +9,28 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (isLoggedIn === 'true') {
 
+        // SESION INICIADA
+
         document.querySelector('.main-site').style.display = 'flex';
         document.getElementById('login-section').style.display = 'none';
         startSessionTimer(); // Iniciar el temporizador si el usuario está logueado
 
         userNameTXT.innerText = currentUser;
+
+
+        // SI LA CUENTA ES DE UN REPARTIDOR
+        if (userNameTXT.innerText === "delivery"){
+            const navButtons = document.querySelector('.nav-buttons');
+            const divNav = document.querySelector('.nav');
+
+            navButtons.innerHTML = '';
+
+            divNav.style.justifyContent = 'center';
+            divNav.style.gap = '4rem';
+
+            showSection('pedidos');
+
+        }
     }
 
     loadProducts();
@@ -78,10 +95,14 @@ function login() {
                     if (user.username === usernameInput.value) {
                         if (user.password === passwordInput.value) {
 
+
+                            // USUARIO Y CONTRASEÑA CORRECTOS
+
                             mainContent.style.display = 'flex';
                             loginPanel.style.display = 'none';
                             localStorage.setItem('loggedIn', 'true');
                             localStorage.setItem('user', `${user.username}`);
+
                             startSessionTimer(); // Iniciar el temporizador de sesión
 
 
