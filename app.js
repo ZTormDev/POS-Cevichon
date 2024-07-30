@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // SI LA CUENTA ES DE UN REPARTIDOR
         if (currentUser.toLowerCase() === "delivery"){
-            
+
             const divNav = document.querySelector('.nav');
             const userContainer = document.querySelector('.user-container');
 
@@ -60,8 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             showSection('pedidos');
         }
-
- 
     }
 
     loadProducts();
