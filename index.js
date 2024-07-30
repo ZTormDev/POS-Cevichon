@@ -1,23 +1,35 @@
 const express = require('express');
-const app = express();
 const path = require('path');
 const orders = require('./db/orders');
 const products = require('./db/products');
 const sales = require('./db/sales');
 const order_items = require('./db/order_items');
 const users = require('./db/users');
+const livereload = require("livereload");
+const connectLivereload = require("connect-livereload")
 
-const port = process.env.PORT || 3000;
+const publicDirectory = path.join(__dirname, './');
+
+const liveReloadServer = livereload.createServer();
+liveReloadServer.watch(publicDirectory);
+
+const app = express();
+app.use(connectLivereload());
 
 app.use(express.json());
 
+const port = process.env.PORT || 3000;
+
+
+
 // Define la carpeta donde están tus archivos estáticos (como main.html)
-app.use(express.static(path.join(__dirname, './')));
+app.use(express.static(publicDirectory));
 
 // Ruta principal para servir main.html
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, './main.html'));
 });
+
 
 
 

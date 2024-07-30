@@ -16,8 +16,8 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <label for="theme" class="theme">
+    <!-- CHANGE THEME BUTTON -->
+    <label for="theme" class="theme theme-button">
         <span class="theme__toggle-wrap">
             <input id="theme" class="theme__toggle" type="checkbox" role="switch" name="theme" value="dark" onclick="toggleTheme()">
             <span class="theme__icon">
@@ -34,11 +34,43 @@
         </span>
     </label>
 
+    <!-- LOADING SCREEN -->
+    <div id="loading-screen" class="loading-screen hidden">
+        <svg viewbox="0 0 100 20">
+            <defs>
+              <linearGradient id="gradient">
+                <stop color="#000"/>
+              </linearGradient>
+              <pattern id="wave" x="0" y="-0.5" width="100%" height="100%" patternUnits="userSpaceOnUse">
+                <path id="wavePath" d="M-40 9 Q-30 7 -20 9 T0 9 T20 9 T40 9 T60 9 T80 9 T100 9 T120 9 V20 H-40z" fill="white"> 
+                  <animateTransform
+                      attributeName="transform"
+                      begin="0s"
+                      dur="1.5s"
+                      type="translate"
+                      from="0,0"
+                      to="40,0"
+                      repeatCount="indefinite" />
+                </path>
+              </pattern>
+            </defs>
+
+            <text text-anchor="middle" x="50" y="11.5" font-size="10" fill="rgb(68, 180, 255)" fill-opacity="1">POS-CEVICHÓN</text>
+            <text text-anchor="middle" x="50" y="11.5" font-size="10" fill="url(#wave)"  fill-opacity="1">POS-CEVICHÓN</text>
+          </svg>
+
+        <div class="loading-anim">
+            <h2>Cargando</h2>
+            <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+        </div>
+    </div>
+
+
 
     <!-- login panel Section -->
 
     <div id="login-section" class="section">
-        <form onsubmit="login()">
+        <form onsubmit="login();return false;">
             <h2>Inicia Sesion</h2>
 
             <p>Nombre de usuario:</p>
@@ -46,7 +78,9 @@
 
             <p>Contraseña:</p>
             <input id="password-input" type="password" placeholder="Contraseña..">
-            
+             
+            <p class="error-txt hidden">Error: Usuario O Contraseña incorrectos</p>
+
             <input type="submit" style="position: absolute; left: -9999px;">
             <button id="login-button" onclick="login()">Iniciar Sesion</button>
         </form>
@@ -54,27 +88,55 @@
 
 
     <div class="main-site">
-            
         <header>
             <div class="nav">
-                <h1>Sistema de Ventas Cevichón</h1>
-                <div class="nav-buttons">
-                    <button id="product-management-button" onclick="showSection('product-management')">Administracion de Productos</button>
-                    <button id="sales-button" onclick="showSection('ventas')">Ventas</button>
-                    <button id="orders-button" onclick="showSection('pedidos'), updateOrderDotStatus(), loadOrders()">Pedidos</button>
-                    <button id="box-button" onclick="showSection('caja')">Caja</button>
+                <h1>POS-Cevichón</h1>
+                
+                <div class="mobile-header">
+                    <div class="nav-buttons">
+                        <label for="theme" class="theme theme-button-mobile">
+                            <span class="theme__toggle-wrap">
+                                <input id="theme" class="theme__toggle" type="checkbox" role="switch" name="theme" value="dark" onclick="toggleTheme()">
+                                <span class="theme__icon">
+                                    <span class="theme__icon-part"></span>
+                                    <span class="theme__icon-part"></span>
+                                    <span class="theme__icon-part"></span>
+                                    <span class="theme__icon-part"></span>
+                                    <span class="theme__icon-part"></span>
+                                    <span class="theme__icon-part"></span>
+                                    <span class="theme__icon-part"></span>
+                                    <span class="theme__icon-part"></span>
+                                    <span class="theme__icon-part"></span>
+                                </span>
+                            </span>
+                        </label>
+                        <div class="buttons-container-nav">
+                            <button class="deliveryButton" id="product-management-button" onclick="showSection('product-management')">Administracion de Productos</button>
+                            <button class="deliveryButton" id="sales-button" onclick="showSection('ventas')">Ventas</button>
+                            <button class="deliveryButton" id="orders-button" onclick="showSection('pedidos'), updateOrderDotStatus(), loadOrders()">Pedidos</button>
+                            <button class="deliveryButton" id="box-button" onclick="showSection('caja')">Caja</button>
+                        </div>
+    
+                        <button class="deliveryButton" id="expand-nav-button" onclick="expandNav()">▼</button>
+                    </div>       
                 </div>
+                <div class="normal-header">
+                    <div class="nav-buttons">
+                        <button id="product-management-button" onclick="showSection('product-management')">Administracion de Productos</button>
+                        <button id="sales-button" onclick="showSection('ventas')">Ventas</button>
+                        <button id="orders-button" onclick="showSection('pedidos'), updateOrderDotStatus(), loadOrders()">Pedidos</button>
+                        <button id="box-button" onclick="showSection('caja')">Caja</button>
+                    </div>
+                </div>  
                 <div class="user-container">
                     <p id="username-text">Nombre de Usuario</p>
                     <button id="user-button" onclick="toggleUserMenu()"><svg width="44px" height="44px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></button>
                     <div class="user-menu hidden">
                         <button id="close-sesion-button" onclick="logout()">Cerrar Sesion</button>
                     </div>
-                </div>
+                </div>       
             </div>
         </header>
-
-
 
 
         
@@ -86,7 +148,7 @@
                     
                     <h3>Catalogo de Productos</h3>
                     <ul class="class-table">
-                        <p>ID</p><p>Nombre</p><p>Precio</p><p>Stock</p>
+                        <p id="id-class-table">ID</p><p>Nombre</p><p>Precio</p><p>Stock</p>
                     </ul>
                     <ul id="products"></ul>
                 </div>

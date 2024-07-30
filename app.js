@@ -2,35 +2,66 @@ function resetSessionTimer() {
     startSessionTimer(); // Reiniciar el temporizador
 }
 
+const loadingScreen = document.getElementById('loading-screen');
+const lightColor = `
+                    linear-gradient(125deg, #4ea5ff, #98cdff)
+                    `;
+const darkColor = `
+                    linear-gradient(125deg, #242424, #3a3a3a)
+                    `;
+const lightColorOrder = `
+                    #6b82eb
+                    `;
+const darkColorOrder = `
+                    #3b3b3b
+                    `;
+
 document.addEventListener('DOMContentLoaded', () => {
     const isLoggedIn = localStorage.getItem('loggedIn');
     const currentUser = localStorage.getItem('user');
-    const userNameTXT = document.getElementById('username-text');
+    const userNameTXT = document.querySelectorAll('#username-text');
+
+    loadingScreen.style.opacity = '0';
+
+    if(!localStorage.getItem(theme)) {
+        localStorage.setItem(theme, 'light')
+        theme = 'light';
+    }
+
+    showLoadingScreenWithoutAnim(2000);
     
     if (isLoggedIn === 'true') {
 
         // SESION INICIADA
-
         document.querySelector('.main-site').style.display = 'flex';
         document.getElementById('login-section').style.display = 'none';
         startSessionTimer(); // Iniciar el temporizador si el usuario está logueado
 
-        userNameTXT.innerText = currentUser;
-
+        userNameTXT.forEach(text => {
+            text.innerText = currentUser;
+        });
 
         // SI LA CUENTA ES DE UN REPARTIDOR
-        if (userNameTXT.innerText === "delivery"){
-            const navButtons = document.querySelector('.nav-buttons');
+        if (currentUser.toLowerCase() === "delivery"){
+            
             const divNav = document.querySelector('.nav');
+            const userContainer = document.querySelector('.user-container');
 
-            navButtons.innerHTML = '';
+            divNavButtons = document.querySelectorAll('.deliveryButton');
+
+            divNavButtons.forEach(button => {
+                button.remove();
+            });
 
             divNav.style.justifyContent = 'center';
-            divNav.style.gap = '4rem';
+            divNav.style.gap = '0rem';
+            divNav.style.flexDirection = 'column';
+            userContainer.style.margin = '1rem 0 1rem 0';
 
             showSection('pedidos');
-
         }
+
+ 
     }
 
     loadProducts();
@@ -38,20 +69,29 @@ document.addEventListener('DOMContentLoaded', () => {
     loadOrders();
 
     theme = localStorage.getItem('theme');
-    const lightColor = 'rgb(142, 175, 212)';
-    const darkColor = 'rgb(30, 30, 30)';
-    const themeInput = document.getElementById('theme');
+    const themeInputs = document.querySelectorAll('#theme');
 
     if (theme == 'dark') {
-        document.querySelector('body').style.backgroundColor = `${darkColor}`;
-        document.getElementById('login-section').style.backgroundColor = `${darkColor}`;
-        themeInput.checked = true;
+        document.querySelector('body').style.background = `${darkColor}`;
+        document.getElementById('login-section').style.background = `${darkColor}`;
+        if(document.querySelector('.details-order-container')) {
+            document.querySelector('.details-order-container').style.backgroundColor = `${darkColorOrder}`;
+        }
+        themeInputs.forEach(input => {
+            input.checked = true;
+        });
+        
         darkmode = true;
     }
     else {
-        document.querySelector('body').style.backgroundColor = `${lightColor}`;
-        document.getElementById('login-section').style.backgroundColor = `${lightColor}`;
-        themeInput.checked = false;
+        document.querySelector('body').style.background = `${lightColor}`;
+        document.getElementById('login-section').style.background = `${lightColor}`;
+        if(document.querySelector('.details-order-container')) {
+            document.querySelector('.details-order-container').style.backgroundColor = `${lightColorOrder}`;
+        }
+        themeInputs.forEach(input => {
+            input.checked = false;
+        });
         darkmode = false;
     }
 
@@ -81,10 +121,7 @@ function startSessionTimer() {
 function login() {
     const usernameInput = document.getElementById('username-input');
     const passwordInput = document.getElementById('password-input');
-    const mainContent = document.querySelector('.main-site');
-    const loginPanel = document.getElementById('login-section');
-
-
+    const userNameTXT = document.querySelectorAll('#username-text');
 
     if (usernameInput.value != '') {
         if (passwordInput.value != '') {
@@ -92,31 +129,85 @@ function login() {
             .then(response => response.json())
             .then(users => {
                 users.forEach(user => {
-                    if (user.username === usernameInput.value) {
+                    const errorTXT = document.querySelector('.error-txt');
+                    if (user.username.toLowerCase() === usernameInput.value.toLowerCase()) {
                         if (user.password === passwordInput.value) {
 
-
+                            errorTXT.classList.add('hidden');
                             // USUARIO Y CONTRASEÑA CORRECTOS
-
-                            mainContent.style.display = 'flex';
-                            loginPanel.style.display = 'none';
                             localStorage.setItem('loggedIn', 'true');
                             localStorage.setItem('user', `${user.username}`);
 
-                            startSessionTimer(); // Iniciar el temporizador de sesión
+                            const currentUser = user.username;
 
+                            // SESION INICIADA
+                            document.querySelector('.main-site').style.display = 'flex';
+                            document.getElementById('login-section').style.display = 'none';
+
+                            userNameTXT.forEach(text => {
+                                text.innerText = currentUser;
+                            });
+
+                            // SI LA CUENTA ES DE UN REPARTIDOR
+                            if (currentUser.toLowerCase() === "delivery"){
+                                const navButtons = document.querySelectorAll('.nav-buttons');
+                                const divNavs = document.querySelectorAll('.nav');
+
+                                navButtons.forEach(navButton => {
+                                    navButton.innerHTML = '';
+                                });
+
+                                divNavs.forEach(divNav => {
+                                    divNav.style.justifyContent = 'center';
+                                    divNav.style.gap = '4rem';
+                                });
+
+                                showSection('pedidos');
+
+                            }
+
+                            startSessionTimer();
+                            showLoadingScreen(1500);
+                           
 
                         } else {
                             console.log('Contraseña Incorrecta');
+                            errorTXT.classList.remove('hidden');
                         }
                     } else {
                         console.log('Nombre de Usuario Incorrecto');
+                        errorTXT.classList.remove('hidden');
                     }
                 });
             })
             .catch(err => console.error('Error loading users:', err));
         }
     }
+    
+}
+
+
+function showLoadingScreen(seconds) {
+    secondsToClose = seconds;
+    loadingScreen.style.opacity = '1';
+    loadingScreen.classList.remove('hidden');
+    setTimeout(closeloadingScreen, secondsToClose);
+}
+
+function showLoadingScreenWithoutAnim(seconds) {
+    secondsToClose = seconds;
+    loadingScreen.style.opacity = '1';
+    loadingScreen.classList.remove('hidden');
+    setTimeout(closeloadingScreen, secondsToClose);
+}
+
+function closeloadingScreen() {
+    loadingScreen.style.opacity = '0';
+
+    setTimeout(function closeLS() {
+        loadingScreen.classList.add('hidden');
+    }, 500)
+    
 }
 
 let isMenuActive = false
@@ -146,18 +237,31 @@ function toggleUserMenu() {
 let darkmode = false;
 function toggleTheme() {
 
-    const lightColor = 'rgb(142, 175, 212)';
-    const darkColor = 'rgb(30, 30, 30)';
+    const themeButtons = document.querySelectorAll('#theme');
 
     if (darkmode == false) {
-        document.querySelector('body').style.backgroundColor = `${darkColor}`;
-        document.getElementById('login-section').style.backgroundColor = `${darkColor}`;
+        document.querySelector('body').style.background = `${darkColor}`;
+        document.getElementById('login-section').style.background = `${darkColor}`;
+        if(document.querySelector('.details-order-container')) {
+            document.querySelector('.details-order-container').style.backgroundColor = `${darkColorOrder}`;
+        }
         localStorage.setItem('theme', 'dark');
+
+        themeButtons.forEach(button => {
+            button.checked = true;
+        });
     }
     else {
-        document.querySelector('body').style.backgroundColor = `${lightColor}`;
-        document.getElementById('login-section').style.backgroundColor = `${lightColor}`;
+        document.querySelector('body').style.background = `${lightColor}`;
+        document.getElementById('login-section').style.background = `${lightColor}`;
+        if(document.querySelector('.details-order-container')) {
+            document.querySelector('.details-order-container').style.backgroundColor = `${lightColorOrder}`;
+        }
         localStorage.setItem('theme', 'light');
+
+        themeButtons.forEach(button => {
+            button.checked = false;
+        });
     }
     darkmode = !darkmode;
 }
@@ -181,15 +285,21 @@ function applyDiscount() {
 }
 
 
+function expandNav() {
+    buttonsContainer = document.querySelector('.buttons-container-nav');
 
+    if(buttonsContainer.style.height === '13rem') {
+        buttonsContainer.style.height = '0';
+    }
+    else {
+        buttonsContainer.style.height = '13rem';
+    }
+}
 
 function showSection(sectionId) {
     document.querySelectorAll('.section').forEach(section => {
         section.style.display = section.id === sectionId ? 'flex' : 'none';
     });
-
-    new Audio('./sfx/clicksound.mp3').play();
-
     if (isActive) {
         isActive = false;
         addManuallyButton.innerHTML = 'Añadir Manualmente';
@@ -208,7 +318,9 @@ function deleteProduct(productId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            
             loadProducts();
+            
         } else {
             console.error('Error deleting product:', data.error);
         }
@@ -255,6 +367,8 @@ function addProduct() {
 
     if (name && price && stock != '')
     {
+        showLoadingScreen(1500);
+
         fetch('/products', {
             method: 'POST',
             headers: {
@@ -316,15 +430,18 @@ function loadSales() {
     .then(response => response.json())
     .then(data => {
         const salesList = document.getElementById('sales');
+
         salesList.innerHTML = '';
         data.forEach(sale => {
             const li = document.createElement('li');
             li.textContent = `Sale ID: ${sale.id} - Product ID: ${sale.product_id} - Quantity: ${formatNumber(sale.quantity)} - Total: $${formatNumber(sale.total_price)} - Date: ${sale.sale_date}`;
             salesList.appendChild(li);
+            li.classList.add('sales-li');
         });
     })
     .catch(err => console.error('Error loading sales:', err));
 }
+
 
 function processSale() {
     const product_id = document.getElementById('sale-product-id').value;
@@ -636,6 +753,9 @@ function completeOrder() {
         address = 'Retiro Local';
     }
 
+
+    showLoadingScreen(1500);
+
     fetch('/orders', {
         method: 'POST',
         headers: {
@@ -694,7 +814,7 @@ function completeOrder() {
             addManuallyButton.style.backgroundColor = buttonColor;
         }
 
-        new Audio('./sfx/clicksound.mp3').play();
+        new Audio('./sfx/purchase.mp3').play();
     })
     .catch(err => console.error('Error adding order:', err));
 }
@@ -772,7 +892,18 @@ function openOrderDetails(orderID) {
 
 
         
-
+        theme = localStorage.getItem('theme');
+        if (theme == 'dark') {
+            if(document.querySelector('.details-order-container')) {
+                document.querySelector('.details-order-container').style.backgroundColor = `${darkColorOrder}`;
+            }
+            
+        }
+        if (theme == 'light') {
+            if(document.querySelector('.details-order-container')) {
+                document.querySelector('.details-order-container').style.backgroundColor = `${lightColorOrder}`;
+            }
+        }
 
 
         if(data.client_address == 'Retiro Local'){
@@ -805,6 +936,9 @@ function openOrderDetails(orderID) {
         });
 
     });
+
+
+    
 }
 
 
